@@ -1,0 +1,38 @@
+[Unit]
+Description=Apache Tomcat Web Application Container JSVC wrapper
+After=syslog.target network.target
+[Service]
+Type=simple
+PIDFile=/var/run/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment=ERRFILE=/opt/tomcat/logs/catalina.out
+Environment=OUTFILE=/opt/tomcat/logs/catalina.out
+EnvironmentFile=/opt/tomcat/conf/tomcat.conf
+Environment=CATALINA_PID=/var/run/tomcat.pid
+Environment=CATALINA_OPTS="-Xmx1g"
+ExecStart=/bin/jsvc \
+            -server \
+            -nodetach \
+            -Djava.awt.headless=true \
+            -cwd ${CATALINA_HOME} \
+            -Dcatalina.home=${CATALINA_HOME} \
+            -Dcatalina.base=${CATALINA_HOME} \
+            -Djava.io.tmpdir=${CATALINA_TMPDIR} \
+            -Djava.util.logging.config.file=${CATALINA_HOME}/conf/logging.properties \
+            -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
+            -cp /usr/share/java/commons-daemon.jar:${CATALINA_HOME}/bin/bootstrap.jar:${CATALINA_HOME}/bin/tomcat-juli.jar \
+            -user tomcat \
+            -java-home ${JAVA_HOME} \
+            -pidfile ${CATALINA_PID} \
+            -errfile ${ERRFILE} \
+            -outfile ${OUTFILE} \
+            $CATALINA_OPTS \
+            org.apache.catalina.startup.Bootstrap
+ExecStop=/bin/jsvc \
+            -pidfile /var/run/tomcat.pid \
+            -stop \
+            org.apache.catalina.startup.Bootstrap
+[Install]
+WantedBy=multi-user.target
+

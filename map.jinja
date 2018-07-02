@@ -1,0 +1,17 @@
+{%- set tomcat = salt['grains.filter_by']({
+    'default': {
+      'install': {
+        'version': '8.0.52',
+        'major': '8',
+        'directory': '/opt',
+        'container_user': 'tomcat',
+        'support_packages': [
+          'wget',
+          'apache-commons-daemon-jsvc',
+        ],
+      },
+      'config': {
+      },
+    },
+  }, merge=salt['pillar.get']('tomcat:lookup'), base='default')
+%}
